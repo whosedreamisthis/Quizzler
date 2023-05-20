@@ -21,14 +21,27 @@ public class Quiz : MonoBehaviour
     [SerializeField] Color32 defaultAnswerColor = new Color32(32, 194, 245, 255);
     [SerializeField] Color32 correctAnswerColor = new Color32(255, 218, 0, 255);
 
-    [Header("Timer")]
+    [Header("Timer2")]
     Timer timer;
     [SerializeField] Image timerImage;
+
+    [Header("Scoring")]
+    [SerializeField] TextMeshProUGUI scoreText;
+    ScoreKeeper scoreKeeper;
+
+    [Header("ProgressBar")]
+    [SerializeField] Slider progressBar;
+    public bool isComplete = false;
     void Start()
     {
+        progressBar.maxValue = questions.Length;
+        progressBar.value = 0;
         currentQuestion = -1;
         timer = FindObjectOfType<Timer>();
+        scoreKeeper = FindObjectOfType<ScoreKeeper>();
+        scoreKeeper.Init(questions.Length);
         GetNextQuestion();
+
     }
 
     public void OnAnswerSelected(int index)
@@ -38,6 +51,7 @@ public class Quiz : MonoBehaviour
         correctAnswerIndex = questions[currentQuestion].GetCorrectAnswerIndex();
 
         DisplayAnswer(index);
+        scoreText.text = "Score: " + scoreKeeper.CalculateScore() + "%";
 
         timer.CancelTimer();
     }
@@ -45,14 +59,21 @@ public class Quiz : MonoBehaviour
     void GetNextQuestion()
     {
         currentQuestion++;
-        if (currentQuestion >= questions.Length)
+        if (currentQuestion < questions.Length)
         {
-            currentQuestion = 0;
+            progressBar.value = currentQuestion + 1;
+            Debug.Log("currentQuestion " + currentQuestion);
+            SetButtonState(true);
+            SetDefaultButtonSprite();
+            DisplayQuestion();
+            scoreKeeper.IncrementQuestionsSeen();
+
         }
-        Debug.Log("currentQuestion " + currentQuestion);
-        SetButtonState(true);
-        SetDefaultButtonSprite();
-        DisplayQuestion();
+        else
+        {
+            isComplete = true;
+        }
+
     }
     void DisplayAnswer(int index)
     {
@@ -63,6 +84,7 @@ public class Quiz : MonoBehaviour
             buttonImage = answerButtons[index].GetComponent<Image>();
             buttonImage.sprite = correctAnswerSprite;
             buttonImage.color = correctAnswerColor;
+            scoreKeeper.IncrementCorrectAnswers();
         }
         else
         {
@@ -108,6 +130,12 @@ public class Quiz : MonoBehaviour
 
         if (timer.loadNextQuestion)
         {
+
+            if (progressBar.value == progressBar.maxValue)
+            {
+                isComplete = true;
+                return;
+            }
             hasAnsweredEarly = false;
             timer.loadNextQuestion = false;
             GetNextQuestion();
