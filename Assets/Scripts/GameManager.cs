@@ -6,23 +6,30 @@ public class GameManager : MonoBehaviour
 {
     Quiz quiz;
     EndScreen endScreen;
-    void Start()
+    bool onEndScreen = false;
+    void Awake()
     {
+        onEndScreen = false;
         quiz = FindObjectOfType<Quiz>();
         endScreen = FindObjectOfType<EndScreen>();
-
+    }
+    void Start()
+    {
         quiz.gameObject.SetActive(true);
         endScreen.gameObject.SetActive(false);
     }
 
     void Update()
     {
-        if (quiz.isComplete)
+        if (quiz.isComplete && !onEndScreen)
         {
-            quiz.gameObject.SetActive(false);
+
             endScreen.gameObject.SetActive(true);
+
+            onEndScreen = true;
             endScreen.ShowFinalScore();
 
+            quiz.gameObject.SetActive(false);
         }
     }
 

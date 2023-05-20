@@ -32,7 +32,7 @@ public class Quiz : MonoBehaviour
     [Header("ProgressBar")]
     [SerializeField] Slider progressBar;
     public bool isComplete = false;
-    void Start()
+    void Awake()
     {
         progressBar.maxValue = questions.Length;
         progressBar.value = 0;

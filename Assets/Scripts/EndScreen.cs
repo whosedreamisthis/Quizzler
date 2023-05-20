@@ -6,10 +6,10 @@ public class EndScreen : MonoBehaviour
 {
     [SerializeField] TextMeshProUGUI finalScoreText;
     // Start is called before the first frame update
-    ScoreKeeper scoreKeeper;
-    void Start()
+    [SerializeField] ScoreKeeper scoreKeeper;
+    void Awake()
     {
-        scoreKeeper = FindObjectOfType<ScoreKeeper>();
+        //scoreKeeper = FindObjectOfType<ScoreKeeper>();
     }
 
     public void ShowFinalScore()
